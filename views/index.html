@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+    <title>Hot in Plano</title>
+    <style>
+        .green {
+            color: #5C7728;
+        }
+
+        .orange {
+            color: #F8AE29;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <article>
+        <header>
+            <h1>Hot in Plano</h1>
+        </header>
+            <hr/>
+            <h3>Temperature: {{.Temperature}} ℉</h3>
+            <h3>Feels Like: {{.FeelsLike}} ℉</h3>
+            <h3>Humidity: {{.Humidity}} %</h3>
+            <h3>ERCOT State: <span class="{{.Style}}">{{.State}}</span></h3>
+            <h3 >PRC: <span title="The amount of operating reserves available to respond quickly to system events in case of sudden changes">{{.PRC}}</span></h3>
+            <blockquote>
+                <p>{{.Note}}</p>
+            </blockquote>
+    </article>
+
+</main>
+</body>
+</html>
