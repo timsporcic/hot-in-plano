@@ -6,17 +6,25 @@ import (
 	"github.com/gofiber/template/html/v2"
 	"hotinplano.com/hot"
 	"strings"
+	"time"
 )
+
+type CachedValues struct {
+	Timestamp   int64
+	Temperature float64
+	Humidity    int
+	FeelsLike   float64
+	Note        string
+	State       string
+	Prc         string
+}
+
+const fiveMin = 60 * 5
 
 func main() {
 
-	//w := hot.GetWeather()
-	//
-	//fmt.Printf("%+v\n", w)
-	//
-	//e := hot.GetErcotData()
-	//
-	//fmt.Printf("%+v\n", e)
+	values := &CachedValues{}
+	updateWeather(values)
 
 	engine := html.New("./views", ".html")
 	app := fiber.New(fiber.Config{
@@ -27,24 +35,38 @@ func main() {
 
 	app.Get("/", func(c *fiber.Ctx) error {
 
-		w := hot.GetWeather()
-		e := hot.GetErcotData()
 		style := "green"
-		state := strings.ToUpper(e.State)
+		state := strings.ToUpper(values.State)
 		if state != "NORMAL" {
 			style = "orange"
 		}
 
+		if time.Now().Unix() > values.Timestamp+fiveMin {
+			updateWeather(values)
+		}
+
 		return c.Render("index", fiber.Map{
-			"Temperature": fmt.Sprintf("%.1f", w.Temperature),
-			"FeelsLike":   fmt.Sprintf("%.1f", w.FeelsLike),
-			"Humidity":    w.Humidity,
+			"Temperature": fmt.Sprintf("%.1f", values.Temperature),
+			"FeelsLike":   fmt.Sprintf("%.1f", values.FeelsLike),
+			"Humidity":    values.Humidity,
 			"State":       state,
-			"PRC":         e.Prc,
-			"Note":        e.Note,
+			"PRC":         values.Prc,
+			"Note":        values.Note,
 			"Style":       style,
 		})
 	})
 
 	app.Listen(":8080")
+}
+
+func updateWeather(values *CachedValues) {
+	w := hot.GetWeather()
+	e := hot.GetErcotData()
+	values.Humidity = w.Humidity
+	values.FeelsLike = w.FeelsLike
+	values.Temperature = w.Temperature
+	values.State = e.State
+	values.Prc = e.Prc
+	values.Note = e.Note
+	values.Timestamp = time.Now().Unix()
 }
