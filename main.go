@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/template/html/v2"
 	"hotinplano.com/hot"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -17,6 +18,7 @@ type CachedValues struct {
 	Note        string
 	State       string
 	Prc         string
+	mu          sync.Mutex
 }
 
 const fiveMin = 60 * 5
@@ -60,13 +62,17 @@ func main() {
 }
 
 func updateWeather(values *CachedValues) {
-	w := hot.GetWeather()
-	e := hot.GetErcotData()
-	values.Humidity = w.Humidity
-	values.FeelsLike = w.FeelsLike
-	values.Temperature = w.Temperature
-	values.State = e.State
-	values.Prc = e.Prc
-	values.Note = e.Note
-	values.Timestamp = time.Now().Unix()
+	values.mu.Lock()
+	defer values.mu.Unlock()
+	if time.Now().Unix() > values.Timestamp+fiveMin {
+		w := hot.GetWeather()
+		e := hot.GetErcotData()
+		values.Humidity = w.Humidity
+		values.FeelsLike = w.FeelsLike
+		values.Temperature = w.Temperature
+		values.State = e.State
+		values.Prc = e.Prc
+		values.Note = e.Note
+		values.Timestamp = time.Now().Unix()
+	}
 }
