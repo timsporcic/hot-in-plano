@@ -15,6 +15,12 @@
         .orange {
             color: #F8AE29;
         }
+
+        .footnote {
+            color: var(--text-light);
+            font-style: italic;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -28,11 +34,12 @@
             <h3>Feels Like: {{.FeelsLike}} ℉</h3>
             <h3>Humidity: {{.Humidity}} %</h3>
             <h3>ERCOT State: <span class="{{.Style}}">{{.State}}</span></h3>
-            <h3 >PRC: <span title="The amount of operating reserves available to respond quickly to system events in case of sudden changes">{{.PRC}}</span></h3>
+            <h3 >PRC*: {{.PRC}}</h3>
             <blockquote>
                 <p>{{.Note}}</p>
             </blockquote>
     </article>
+    <p><i class="footnote">*PRC is the amount of operating reserves available to respond quickly to system events in case of sudden changes</i></p>
 
 </main>
 </body>
